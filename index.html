@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Expenses Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Daily Expenses Tracker</h1>
+
         <form id="expense-form">
+            <div class="input-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
             <div class="input-group">
                 <label for="transportation">Transportation Expenses:</label>
                 <input type="number" id="transportation" name="transportation" required>
@@ -25,12 +31,12 @@
             <button type="submit">Save Expenses</button>
         </form>
 
-        <h2>Today's Expenses Summary</h2>
+        <h2>Expenses Summary</h2>
         <div id="expenses-summary">
             <p>No expenses recorded yet. Please add your expenses.</p>
         </div>
-        
-        <button id="clear-expenses">Clear All Expenses</button>
+
+        <button id="download-excel">Download Expenses as Excel</button>
     </div>
 
     <script src="script.js"></script>
