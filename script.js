@@ -1,41 +1,41 @@
 // Get elements
 const form = document.getElementById('expense-form');
+const dateInput = document.getElementById('date');
 const transportationInput = document.getElementById('transportation');
 const mealInput = document.getElementById('meal');
 const otherInput = document.getElementById('other');
 const summaryDiv = document.getElementById('expenses-summary');
-const clearButton = document.getElementById('clear-expenses');
+const downloadButton = document.getElementById('download-excel');
 
-// Function to update expenses summary
+// Store expenses data
+let expensesData = [];
+
+// Function to update the expenses summary
 function updateSummary() {
-    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-    
-    if (expenses.length === 0) {
+    if (expensesData.length === 0) {
         summaryDiv.innerHTML = "<p>No expenses recorded yet. Please add your expenses.</p>";
     } else {
-        let totalTransportation = 0;
-        let totalMeal = 0;
-        let totalOther = 0;
-        
-        expenses.forEach(expense => {
-            totalTransportation += expense.transportation;
-            totalMeal += expense.meal;
-            totalOther += expense.other;
+        let summaryHTML = '<table><tr><th>Date</th><th>Transportation</th><th>Meal</th><th>Other</th></tr>';
+        expensesData.forEach(expense => {
+            summaryHTML += `
+                <tr>
+                    <td>${expense.date}</td>
+                    <td>${expense.transportation}</td>
+                    <td>${expense.meal}</td>
+                    <td>${expense.other}</td>
+                </tr>
+            `;
         });
-
-        summaryDiv.innerHTML = `
-            <p><strong>Transportation Expenses:</strong> $${totalTransportation.toFixed(2)}</p>
-            <p><strong>Meal Allowance:</strong> $${totalMeal.toFixed(2)}</p>
-            <p><strong>Other Expenses:</strong> $${totalOther.toFixed(2)}</p>
-            <p><strong>Total Expenses:</strong> $${(totalTransportation + totalMeal + totalOther).toFixed(2)}</p>
-        `;
+        summaryHTML += '</table>';
+        summaryDiv.innerHTML = summaryHTML;
     }
 }
 
 // Event listener for form submission
 form.addEventListener('submit', function(event) {
     event.preventDefault();
-    
+
+    const date = dateInput.value;
     const transportation = parseFloat(transportationInput.value);
     const meal = parseFloat(mealInput.value);
     const other = parseFloat(otherInput.value);
@@ -46,36 +46,52 @@ form.addEventListener('submit', function(event) {
     }
 
     const newExpense = {
+        date,
         transportation,
         meal,
         other
     };
 
-    // Get current expenses from localStorage
-    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-
     // Add the new expense to the array
-    expenses.push(newExpense);
+    expensesData.push(newExpense);
 
-    // Save updated expenses array back to localStorage
-    localStorage.setItem('expenses', JSON.stringify(expenses));
-
-    // Clear form inputs
-    transportationInput.value = '';
-    mealInput.value = '';
-    otherInput.value = '';
+    // Clear the form
+    form.reset();
 
     // Update the expenses summary
     updateSummary();
 });
 
-// Event listener for clearing all expenses
-clearButton.addEventListener('click', function() {
-    if (confirm("Are you sure you want to clear all expenses?")) {
-        localStorage.removeItem('expenses');
-        updateSummary();
+// Event listener for downloading the Excel file
+downloadButton.addEventListener('click', function() {
+    if (expensesData.length === 0) {
+        alert("No expenses to download.");
+        return;
     }
-});
 
-// Initial call to display the summary
-updateSummary();
+    // Create a new Excel workbook
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Expenses');
+
+    // Add headers to the sheet
+    worksheet.columns = [
+        { header: 'Date', key: 'date', width: 20 },
+        { header: 'Transportation', key: 'transportation', width: 15 },
+        { header: 'Meal', key: 'meal', width: 15 },
+        { header: 'Other', key: 'other', width: 15 }
+    ];
+
+    // Add each expense as a row
+    expensesData.forEach(expense => {
+        worksheet.addRow(expense);
+    });
+
+    // Generate the Excel file and trigger download
+    workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'daily_expenses.xlsx';
+        link.click();
+    });
+});
