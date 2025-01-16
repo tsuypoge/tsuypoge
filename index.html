@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Expenses Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Expenses Tracker</h1>
+        <form id="expense-form">
+            <div class="input-group">
+                <label for="transportation">Transportation Expenses:</label>
+                <input type="number" id="transportation" name="transportation" required>
+            </div>
+            <div class="input-group">
+                <label for="meal">Meal Allowance:</label>
+                <input type="number" id="meal" name="meal" required>
+            </div>
+            <div class="input-group">
+                <label for="other">Other Expenses:</label>
+                <input type="number" id="other" name="other" required>
+            </div>
+            <button type="submit">Save Expenses</button>
+        </form>
+
+        <h2>Today's Expenses Summary</h2>
+        <div id="expenses-summary">
+            <p>No expenses recorded yet. Please add your expenses.</p>
+        </div>
+        
+        <button id="clear-expenses">Clear All Expenses</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
